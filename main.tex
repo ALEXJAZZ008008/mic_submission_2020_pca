@@ -1,0 +1,94 @@
+\documentclass[10pt, twocolumn, twoside, letterpaper]{IEEEtran}
+
+\usepackage[activate={true, nocompatibility}, final, tracking=true, kerning=true, spacing=true, factor=1100, stretch=10, shrink=10]{microtype}
+\linespread{0.9}
+
+%\def\mycopyrightnotice{
+%  {\footnotesize
+%  \begin{minipage}{\textwidth}
+%  \centering
+%  {978-1-7281-4164-0/19/\$31.00 \copyright2019 IEEE
+%  \end{minipage}
+%  }
+%}
+
+\makeatletter
+\def\ps@IEEEtitlepagestyle{
+  %\def\@oddfoot{\mycopyrightnotice}
+  \def\@evenfoot{}
+}
+
+\ifCLASSINFOpdf
+   \usepackage[pdftex]{graphicx}
+\else
+   \usepackage[dvips]{graphicx}
+\fi
+
+\ifCLASSOPTIONcompsoc
+  \usepackage[caption=false, font=normalsize, labelfont=sf, textfont=sf]{subfig}
+\else
+  \usepackage[caption=false, font=footnotesize]{subfig}
+\fi
+
+\usepackage{amsmath}
+\usepackage{bm}
+\usepackage{amssymb}
+\usepackage{algorithm}
+\usepackage{algorithmic}
+\usepackage{stfloats}
+\usepackage{url}
+\usepackage{siunitx}
+\usepackage{fancyref}
+
+\input{glossary}
+
+\newcommand{\cmmnt}[1]{\@bsphack\@esphack}
+
+\usepackage[style=ieee, doi=false, isbn=false, url=false, maxbibnames=1, minbibnames=1, maxcitenames=1, mincitenames=1, backend=biber, defernumbers=false]{biblatex}
+\addbibresource{./bibtex/bib/Biblio.bib}
+
+%\IEEEpubid{\begin{minipage}{\textwidth}\ \\[9pt] \centering
+%\medskip
+%\\
+%978-1-7281-2260-1/19/\$31.00~\copyright~2019~IEEE
+%\end{minipage}}
+
+\begin{document}
+\title{Extension of Static PCA Based Data Driven Surrogate Signal Extraction Methods to Dynamic PET Using Moving Windows and Eigenvector Backpropergation}
+
+\pagestyle{plain}
+\pagenumbering{gobble}
+
+\author{Alexander~C.~Whitehead,~\IEEEmembership{Student~Member,~IEEE,}
+        Elise~C.~Emond
+        Kuan-Hao~Su
+        Ander~Biguri
+        Joanna~C.~Porter
+        Helen~Garthwaite
+        Maria?
+        Scott~W.~Wollenweber,~\IEEEmembership{Senior~Member~IEEE,}
+        Charles~W.~Stearns,~\IEEEmembership{Fellow,~IEEE,}
+        Brian~F.~Hutton,~\IEEEmembership{Senior~Member,~IEEE,}
+        Jamie~R.~McClelland
+        and~Kris~Thielemans,~\IEEEmembership{Senior~Member,~IEEE}%
+
+    \thanks{Alexander~C.~Whitehead, Brian~F.~Hutton and Kris~Thielemans are with the Institute of Nuclear Medicine, University College London, London, NW1~2BU, UK (contact: \texttt{alexander.whitehead.18@ucl.ac.uk}).}%
+    \thanks{Alexander~C.~Whitehead and Jamie~R.~McClelland are with the Centre for Medical Image Computing, University College London, London, NW1~2BU, UK.}%
+    \thanks{Scott~Wollenweber and Charles~Stearns are with Molecular Imaging \& Computed Tomography Engineering, GE Healthcare, USA}%
+    \thanks{This research is supported by GE Healthcare, the NIHR UCLH Biomedical Research Centre and the EPSRC-funded UCL Centre for Doctoral Training in Medical Imaging (EP/L016478/1). The software used was partly produced by the Computational Collaborative Project in Synergistic PET-MR Reconstruction, CCP PET-MR, UK EPSRC grant EP/M022587/1 and the CCP on Synergistic Biomedical Imaging, CCP SyneRBI, UK EPSRC grant EP/T026693/1}%
+    \thanks{Jamie~R.~McClelland is supported by a Cancer Research UK Centres Network Accelerator Award Grant (A21993) to the ART-NET consortium and a CRUK Multi-disciplinary grant (CRC 521).}%
+}
+
+\maketitle
+\IEEEpeerreviewmaketitle
+
+\begin{abstract}
+    
+\end{abstract}
+
+\input{body}
+
+\AtNextBibliography{\scriptsize}
+\printbibliography
+
+\end{document}
