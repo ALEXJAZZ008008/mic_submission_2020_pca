@@ -1,19 +1,41 @@
 \section{Introduction} \label{sec:introduction}
-    \IEEEPARstart{R}{espiratory} motion reduces image resolution in \gls{PET} by introducing blurring and mis-alignment artefacts~\cite{Nehmeh2008a}. 
+    \IEEEPARstart{R}{espiratory} motion reduces image resolution in \gls{PET} by introducing blurring \& mis-alignment artefacts~\cite{Nehmeh2008a}. 
 
 \section{Methods} \label{sec:methods}
+\subsection{Data Acquisition} \label{sec:data_acquisition}
+        Seven dynamic \gls{FDG} scans, with a \gls{FOV} covering the upper lung \& heart, were acquired on a \gls{GE} Discovery 710 at \gls{UCLH}. Each scan lasted approximately \SI{20}{\minute} with the scan starting before injection of the radiotracer. \gls{SS} were acquired in parallel using a \gls{RPM}.
+        
+    \subsection{Data Preparation} \label{sec:data_preparation}
+        The data from~\Fref{sec:data_acquisition} were unlisted into low resolution sinograms, at a time interval of \SI{500}{\milli\second}, using the \gls{GE} PetToolbox following~\cite{Bertolli2018Data-DrivenTomography}. This data then underwent preprocessing by first removing the first \& last element in the axial direction, this portion of the data contained significantly more noise than the rest of the data \& hinders later processes. Next, the data is normalised by finding its \gls{SSRB} normalisation factors \& applying those to it. Finally, the data initially has its mean subtracted, element by element, from it \& is then divided, element by element, before having a Freeman-Tukey transformation applied to stabilise the variance of the Poisson data. The Freeman-Tukey transformation is defined as:
+        
+        \begin{equation}
+            \forall t \in [1, n_t],\quad S_t := 2 \sqrt{s_t + \frac{3}{8}}
+        \end{equation}
+        
+        \noindent $S_t$ is the resultant sinogram of applying the Freeman-Tukey transformation to sinogram $s_t$ at time point $t$~\cite{Freeman1950TransformationsRoot}.
+    
+    \subsection{Surrogate Signal Extraction} \label{sec:surrogate_signal_extraction}
+        \subsubsection{Moving Window} \label{sec:moving_window}
+            This method takes data from a window which initially starts as wide as one respiratory cycle but expands as the acquisition goes on \& applies \gls{PCA} to these windows independently. The motivation is that at early time points the variation caused by the tracer kinetics obscures that which comes from respiratory motion, however, if small enough time frames are taken, because of the different periods of the variation, of tracer kinetics \& respiratory motion, then the respiratory \gls{SS} should be obtainable. Specifically, after being gated into windows, which overlap by one half of the windows length, this data has a masked \gls{PCA} applied where the mask is a lower threshold which removes part of the noise. The \gls{SS} for each time point is then concatenated to the next using \gls{CC} to determine the sign of the \gls{SS}.
+        
+        \subsubsection{One \gls{PC}} \label{sec:one_pc}
+            This method takes late time point \glss{PC} \& applies them to early time point data. The motivation is that the \glss{PC} of late time point data do not vary significantly. Therefore, it could be assumed that the variation of early time point \glss{PC} are caused mostly by the tracer kinetics. Specifically, this method takes the \gls{PC} from the last window of the moving window method~\Fref{sec:moving_window} \& multiplies it by the whole data set to acquire a \gls{SS} in one calculation.
+        
+        \subsubsection{Joint Method} \label{sec:joint_method}
+            This method attempts to take the advantages of both the one \gls{PC} method as well as the static method, by truncating \& concatenating the result of the start of the one \gls{PC} method \& the end of the moving window method (where windows are long). The motivation is that the static method could be assumed to work better on static data \& once the tracer kinetics have subsided then the acquisition could be assumed to be static.
     
     
     \subsection{Evaluation} \label{sec:evaluation}
+        To evaluate first the early time point \glss{SS} of one scan have been plotted alongside the \gls{RPM} \gls{SS} in order to visually assess the correlation of the \glss{SS}, additionally the \gls{CC} of the whole of each \gls{SS} of all scans has also been calculated. Secondly, the \glss{SS} of one scan have been used to displacement gate that scan into $10$ bins, reconstruct, \& then execute a \gls{MC} by registering (and applying a \gls{MM} using a linear regression over the \glss{DVF} \& \gls{SS}) the volumes to the mean position. Reconstructions were performed using \gls{GE} Duetto using \gls{TOF} \gls{OSEM} with two full iterations \& $24$ subsets.%~\cite{Hudson1994}.
+        Volumes were post-filtered using a Gaussian blur with a kernel size of \SI{6.4}{\milli\metre} \gls{FWHM}. Comparisons between these \gls{MC} reconstructed volumes including: a visual analysis, a profile over the aorta (hot edge) \& \gls{SUV}\textsubscript{max}, \gls{SUV}\textsubscript{median} \& \gls{SUV}\textsubscript{peak}. \gls{SUV}\textsubscript{peak} here was defined following \gls{EANM} guidelines.%~\cite{Boellaard2015FDG2.0}
         
-
 \section{Results} \label{sec:results}
     \begin{table}
         \centering
         \captionsetup{singlelinecheck=false, justification=centering}
-        \caption{Comparison of \gls{SUV}\textsubscript{max}, \gls{SUV}\textsubscript{median} and \gls{SUV}\textsubscript{peak} between the \glsed{CCP} using a \gls{CCT} \gls{Mu-Map} volume, \glsed{CCP} using a static \gls{CT} \gls{Mu-Map} volume, new method using the \gls{NAC} \gls{RCM} volume and new method using the \gls{AC} \gls{RCM} volume.}
+        \caption{A comparison of the \gls{CC} between the \gls{RPM} \gls{SS} \& the \gls{SS} from the static \gls{PCA}, the moving window, the one \gls{PC} \& the joint methods for $7$ dynamic \gls{FDG} scans acquired on a \gls{GE} Discovery 710 \gls{PET}/\gls{CT} scanner.}
         
-        \resizebox*{1.0\linewidth}{!}
+        \resizebox*{0.75\linewidth}{!}
         {
             \begin{tabular}{||c|cccc||}
                 \hline
@@ -22,24 +44,31 @@
                 \textbf{Scan $1$}   & $0.0387$  & $0.486$  & $0.565$  & $0.493$   \\
                 \textbf{Scan $2$}   & $0.0985$  & $0.0361$ & $0.281$  & $0.0227$  \\
                 \textbf{Scan $3$}   & $0.00797$ & $0.0388$ & $0.224$  & $0.00459$ \\
-                % \textbf{Scan $4$}   & $0.149$   & $0.0174$ & $0.182$  & $0.0662$ \\
-                \textbf{Scan $4$}   & $0.242$   & $0.0467$ & $0.273$  & $0.0946$ \\
-                \textbf{Scan $5$}   & $0.0759$  & $0.793$  & $0.819$  & $0.798$ \\
-                \textbf{Scan $6$}   & $0.0594$  & $0.246$  & $0.363$  & $0.259$ \\
-                \textbf{Scan $7$}   & $0.160$   & $0.629$  & $0.203$  & $0.526$ \\
-                % \textbf{Scan $9$}   & $0.238$   & $0.280$  & $0.0752$ & $0.164$ \\
-                % \textbf{Scan $10$}  & $0.0343$  & $0.0674$ & $0.0150$ & $0.0460$ \\
+                \textbf{Scan $4$}   & $0.242$   & $0.0467$ & $0.273$  & $0.0946$  \\
+                \textbf{Scan $5$}   & $0.0759$  & $0.793$  & $0.819$  & $0.798$   \\
+                \textbf{Scan $6$}   & $0.0594$  & $0.246$  & $0.363$  & $0.259$   \\
+                \textbf{Scan $7$}   & $0.160$   & $0.629$  & $0.203$  & $0.526$   \\
                 \hline
             \end{tabular}
         }
         \label{tab:cross_correlation}
     \end{table}
     
+    The \gls{CC} results between the \gls{RPM} \gls{SS} and all of the methods for all of the scans can be seen in~\Fref{tab:cross_correlation}
+    
     \begin{figure}
         \centering
-        \includegraphics[width=1.0\linewidth]{figures/visual_analysis_pca.png}
+        \includegraphics[width=1.0\linewidth]{figures/surrogate_signal.png}
         \captionsetup{singlelinecheck=false, justification=centering}
-        \caption{First row: \glsed{CCP} using a \gls{CCT} \gls{Mu-Map}. Second row: \glsed{CCP} using a static \gls{CT} \gls{Mu-Map}. Third row: New method using the \gls{NAC} \gls{RCM}. Forth row: New method using the \gls{AC} \gls{RCM}. Colour map ranges are consistent for all images.}
+        \caption{A comparison between the \gls{RPM} \gls{SS} \& the \gls{SS} from the static \gls{PCA}, the moving window, the one \gls{PC} \& the joint methods for dynamic scan $1$ between \SI{40}{\second} \& \SI{110}{\second}.}
+        \label{fig:surrogate_signal}
+    \end{figure}
+    
+    \begin{figure}
+        \centering
+        \includegraphics[width=0.75\linewidth]{figures/visual_analysis_pca.png}
+        \captionsetup{singlelinecheck=false, justification=centering}
+        \caption{Reconstructions of dynamic scan $1$ using \gls{MC} including the \gls{SS} derived from; first row: \gls{RPM}, second row: Static \gls{PCA} method, third row: moving window method, forth row: one \gls{PC} method \& firth row: joint method. Colour map ranges are consistent for all images.}
         \label{fig:visual_analysis}
     \end{figure}
     
@@ -47,16 +76,16 @@
         \centering
         \includegraphics[width=0.5\linewidth]{figures/profile_pca.png}
         \captionsetup{singlelinecheck=false, justification=centering}
-        \caption{A profile across the lesion for the \glsed{CCP} using a \gls{CCT} \gls{Mu-Map} volume, \glsed{CCP} using a static \gls{CT} \gls{Mu-Map} volume, new method using the \gls{NAC} \gls{RCM} volume and new method using the \gls{AC} \gls{RCM} volume.}
+        \caption{A profile across the aeorta for reconstructions of dynamic scan $1$ using \gls{MC} including the \gls{SS} derived from; \gls{RPM}, Static \gls{PCA} method, moving window method, one \gls{PC} method \& joint method.}
         \label{fig:profile}
     \end{figure}
     
     \begin{table}
         \centering
         \captionsetup{singlelinecheck=false, justification=centering}
-        \caption{Comparison of \gls{SUV}\textsubscript{max}, \gls{SUV}\textsubscript{median} and \gls{SUV}\textsubscript{peak} between the \glsed{CCP} using a \gls{CCT} \gls{Mu-Map} volume, \glsed{CCP} using a static \gls{CT} \gls{Mu-Map} volume, new method using the \gls{NAC} \gls{RCM} volume and new method using the \gls{AC} \gls{RCM} volume.}
+        \caption{Comparison of \gls{SUV}\textsubscript{max}, \gls{SUV}\textsubscript{median} \& \gls{SUV}\textsubscript{peak} between reconstructions of dynamic scan $1$ using \gls{MC} including the \gls{SS} derived from; \gls{RPM}, Static \gls{PCA} method, moving window method, one \gls{PC} method \& joint method.}
         
-        \resizebox*{1.0\linewidth}{!}
+        \resizebox*{0.5\linewidth}{!}
         {
             \begin{tabular}{||c|ccc||}
                 \hline
@@ -76,5 +105,5 @@
     
      
 
-\section{Discussion and Conclusions} \label{sec:discussion_and_conclusions}
+\section{Discussion \& Conclusions} \label{sec:discussion_and_conclusions}
     
