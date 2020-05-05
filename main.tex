@@ -59,7 +59,7 @@
     \thanks{Alexander~C.~Whitehead \& Jamie~R.~McClelland are with the Centre for Medical Image Computing, University College London, London, NW1~2BU, UK.}%
     \thanks{Kuan-Hao~Su, Scott~Wollenweber \& Charles~Stearns are with Molecular Imaging \& Computed Tomography Engineering, GE Healthcare, USA}%
     \thanks{Joanna~C.~Porter \& Helen~Garthwaite are with the Centre for Respiratory Medicine, University College London, London, NW1~2BU, UK.}%
-    \thanks{Joanna~C.~Porter, Helen~Garthwaite and Maria~Machado are with University College Hospital, 235 Euston Rd, Bloomsbury, London NW1 2BU}%
+    \thanks{Joanna~C.~Porter, Helen~Garthwaite \& Maria~Machado are with University College Hospital, 235 Euston Rd, Bloomsbury, London NW1 2BU}%
     \thanks{This research is supported by GE Healthcare, the NIHR UCLH Biomedical Research Centre \& the EPSRC-funded UCL Centre for Doctoral Training in Medical Imaging (EP/L016478/1). The software used was partly produced by the Computational Collaborative Project in Synergistic PET-MR Reconstruction, CCP PET-MR, UK EPSRC grant EP/M022587/1 \& the CCP on Synergistic Biomedical Imaging, CCP SyneRBI, UK EPSRC grant EP/T026693/1}%
     \thanks{Jamie~R.~McClelland is supported by a Cancer Research UK Centres Network Accelerator Award Grant (A21993) to the ART-NET consortium \& a CRUK Multi-disciplinary grant (CRC 521).}%
 }
@@ -68,7 +68,7 @@
 \IEEEpeerreviewmaketitle
 
 \begin{abstract}
-    Respiratory motion correction is beneficial in positron emission tomography.
+    Respiratory motion correction is beneficial in positron emission tomography. Methods of motion correction include gated reconstruction where the acquisition is binned based on a respiratory trace. To acquire these respiratory traces an external device like the Real Time Position Management system or a data driven method such as principal component analysis could be used. Data driven methods have the advantage that they are non-invasive \& can be performed post-acquisition, however, data driven methods have the disadvantage that they are adversely affected by the tracer kinetics of a dynamic acquisition. This work seeks to evaluate data driven methods through which they can be used with dynamic data. The methods explored in this work include; using a moving window, where principal component analysis is applied to snippets of the data \& then concatenated, \& a one principal component method, where a late time point principal component is used to estimate the surrogate signal for all of the data at once. The respiratory traces acquired are evaluated by calculating their cross correlation with a Real Time Position Management surrogate signal \& also by performing \& comparing gated reconstructions using the traces. The results found are that all methods produce better surrogate signals than when applying static principle component analysis to dynamic data \& also that the one principal component method produces the most promising results. Implications for future research include further tuning the hyper parameters of the one principal component method, evaluating it on a larger set of data \& using it in more complex motion correction algorithms.
 \end{abstract}
 
 \input{body}
