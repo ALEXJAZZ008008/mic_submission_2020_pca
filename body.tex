@@ -3,16 +3,16 @@
 
 \section{Methods} \label{sec:methods}
 \subsection{Data Acquisition} \label{sec:data_acquisition}
-        Seven dynamic \gls{FDG} scans, with a \gls{FOV} covering the upper lung \& heart, were acquired on a \gls{GE} Discovery 710 at \gls{UCLH}. Each scan lasted approximately \SI{20}{\minute} with the scan starting before injection of the radiotracer. \gls{SS} were acquired in parallel using a \gls{RPM}.
+        Seven dynamic \gls{FDG} acquisitions, with a \gls{FOV} covering the upper lung \& heart, were acquired on a \gls{GE} Discovery $710$. Each acquisition lasted approximately \SI{20}{\minute} with the acquisition starting before injection of the radiotracer. \gls{SS} were acquired in parallel using a \gls{RPM}.
         
     \subsection{Data Preparation} \label{sec:data_preparation}
-        The data from~\Fref{sec:data_acquisition} were unlisted into low resolution sinograms, at a time interval of \SI{500}{\milli\second}, using the \gls{GE} PetToolbox following~\cite{Bertolli2018Data-DrivenTomography}. This data then underwent preprocessing by first removing the first \& last element in the axial direction, this portion of the data contained significantly more noise than the rest of the data \& hinders later processes. Next, the data is normalised by finding its \gls{SSRB} normalisation factors \& applying those to it. Finally, the data initially has its mean subtracted, element by element, from it \& is then divided, element by element, before having a Freeman-Tukey transformation applied to stabilise the variance of the Poisson data. The Freeman-Tukey transformation is defined as:
+        Data were unlisted into low resolution sinograms, at a time interval of \SI{500}{\milli\second}, using the \gls{GE} PetToolbox following~\cite{Bertolli2018Data-DrivenTomography}. Data was preprocessed by removing the first \& last element in the axial direction, this portion of the data contained significantly more noise than the rest of the data \& hinders later processes. Next, the data is normalised by finding its \gls{SSRB} normalisation factors \& applying those to it. Finally, the data initially has its mean subtracted, element by element, from it \& is then divided, element by element, before having a Freeman-Tukey transformation applied to stabilise the variance of the Poisson data. The Freeman-Tukey transformation is defined as:
         
         \begin{equation}
-            \forall t \in [1, n_t],\quad S_t := 2 \sqrt{s_t + \frac{3}{8}}
+            S = 2 \sqrt{S + \frac{3}{8}}
         \end{equation}
         
-        \noindent $S_t$ is the resultant sinogram of applying the Freeman-Tukey transformation to sinogram $s_t$ at time point $t$~\cite{Freeman1950TransformationsRoot}.
+        \noindent $S$ is the resultant sinogram of applying the Freeman-Tukey transformation to sinogram $S$~\cite{Freeman1950TransformationsRoot}.
     
     \subsection{Surrogate Signal Extraction} \label{sec:surrogate_signal_extraction}
         \subsubsection{Moving Window} \label{sec:moving_window}
@@ -26,14 +26,14 @@
     
     
     \subsection{Evaluation} \label{sec:evaluation}
-        To evaluate first the early time point \glss{SS} of one scan have been plotted alongside the \gls{RPM} \gls{SS} in order to visually assess the correlation of the \glss{SS}, additionally the \gls{CC} of the whole of each \gls{SS} of all scans has also been calculated. Secondly, the \glss{SS} of one scan have been used to displacement gate that scan into $10$ bins, reconstruct, \& then execute a \gls{MC} by registering (and applying a \gls{MM} using a linear regression over the \glss{DVF} \& \gls{SS}) the volumes to the mean position. Reconstructions were performed using \gls{GE} Duetto using \gls{TOF} \gls{OSEM} with two full iterations \& $24$ subsets.%~\cite{Hudson1994}.
+        To evaluate first the early time point \glss{SS} of one acquisition have been plotted alongside the \gls{RPM} \gls{SS} in order to visually assess the correlation of the \glss{SS}, additionally the \gls{CC} of the whole of each \gls{SS} of all acquisitions has also been calculated. Secondly, the \glss{SS} of one acquisition have been used to displacement gate the data from that acquisition into $10$ bins, reconstruct, \& then execute a \gls{MC} by registering (and applying a \gls{MM} using a linear regression over the \glss{DVF} \& \gls{SS}) the volumes to the mean position. Reconstructions were performed using \gls{GE} Duetto using \gls{TOF} \gls{OSEM} with two full iterations \& $24$ subsets.%~\cite{Hudson1994}.
         Volumes were post-filtered using a Gaussian blur with a kernel size of \SI{6.4}{\milli\metre} \gls{FWHM}. Comparisons between these \gls{MC} reconstructed volumes including: a visual analysis, a profile over the aorta (hot edge) \& \gls{SUV}\textsubscript{max}, \gls{SUV}\textsubscript{median} \& \gls{SUV}\textsubscript{peak}. \gls{SUV}\textsubscript{peak} here was defined following \gls{EANM} guidelines.%~\cite{Boellaard2015FDG2.0}
         
 \section{Results} \label{sec:results}
     \begin{table}
         \centering
         \captionsetup{singlelinecheck=false, justification=centering}
-        \caption{A comparison of the \gls{CC} between the \gls{RPM} \gls{SS} \& the \gls{SS} from the static \gls{PCA}, the moving window, the one \gls{PC} \& the joint methods for $7$ dynamic \gls{FDG} scans acquired on a \gls{GE} Discovery 710 \gls{PET}/\gls{CT} scanner.}
+        \caption{A comparison of the \gls{CC} between the \gls{RPM} \gls{SS} \& the \gls{SS} from the static \gls{PCA}, the moving window, the one \gls{PC} \& the joint methods for $7$ dynamic \gls{FDG} acquisition acquired on a \gls{GE} Discovery 710 \gls{PET}/\gls{CT} scanner.}
         
         \resizebox*{0.75\linewidth}{!}
         {
@@ -41,26 +41,26 @@
                 \hline
                 \textbf{\gls{CC}} & \textbf{Static \gls{PCA}} & \textbf{Moving Window} & \textbf{One \gls{PC}} & \textbf{Joint Method} \\
                 \hline
-                \textbf{Scan $1$}   & $0.0387$  & $0.486$  & $0.565$  & $0.493$   \\
-                \textbf{Scan $2$}   & $0.0985$  & $0.0361$ & $0.281$  & $0.0227$  \\
-                \textbf{Scan $3$}   & $0.00797$ & $0.0388$ & $0.224$  & $0.00459$ \\
-                \textbf{Scan $4$}   & $0.242$   & $0.0467$ & $0.273$  & $0.0946$  \\
-                \textbf{Scan $5$}   & $0.0759$  & $0.793$  & $0.819$  & $0.798$   \\
-                \textbf{Scan $6$}   & $0.0594$  & $0.246$  & $0.363$  & $0.259$   \\
-                \textbf{Scan $7$}   & $0.160$   & $0.629$  & $0.203$  & $0.526$   \\
+                \textbf{Acquisition $1$}   & $0.0387$  & $0.486$  & $0.565$  & $0.493$   \\
+                \textbf{Acquisition $2$}   & $0.0985$  & $0.0361$ & $0.281$  & $0.0227$  \\
+                \textbf{Acquisition $3$}   & $0.00797$ & $0.0388$ & $0.224$  & $0.00459$ \\
+                \textbf{Acquisition $4$}   & $0.242$   & $0.0467$ & $0.273$  & $0.0946$  \\
+                \textbf{Acquisition $5$}   & $0.0759$  & $0.793$  & $0.819$  & $0.798$   \\
+                \textbf{Acquisition $6$}   & $0.0594$  & $0.246$  & $0.363$  & $0.259$   \\
+                \textbf{Acquisition $7$}   & $0.160$   & $0.629$  & $0.203$  & $0.526$   \\
                 \hline
             \end{tabular}
         }
         \label{tab:cross_correlation}
     \end{table}
     
-    The \gls{CC} results between the \gls{RPM} \gls{SS} and all of the methods for all of the scans can be seen in~\Fref{tab:cross_correlation}
+    A comparison of \gls{CC} can be seen in in~\Fref{tab:cross_correlation}. The results for the moving window method show that it usually performs better than static \gls{PCA}, a reason why these results may be so varied is because the hyper parameters for this method were optimised for one acquisition \& as such results for other acquisitions may suffer. The results for the one \gls{PC} method are consistently better than the static \gls{PCA} method.
     
     \begin{figure}
         \centering
         \includegraphics[width=1.0\linewidth]{figures/surrogate_signal.png}
         \captionsetup{singlelinecheck=false, justification=centering}
-        \caption{A comparison between the \gls{RPM} \gls{SS} \& the \gls{SS} from the static \gls{PCA}, the moving window, the one \gls{PC} \& the joint methods for dynamic scan $1$ between \SI{40}{\second} \& \SI{110}{\second}.}
+        \caption{A comparison between the \gls{RPM} \gls{SS} \& the \gls{SS} from the static \gls{PCA}, the moving window, the one \gls{PC} \& the joint methods for dynamic acquisition $1$ between \SI{40}{\second} \& \SI{110}{\second}.}
         \label{fig:surrogate_signal}
     \end{figure}
     
@@ -68,7 +68,7 @@
         \centering
         \includegraphics[width=0.75\linewidth]{figures/visual_analysis_pca.png}
         \captionsetup{singlelinecheck=false, justification=centering}
-        \caption{Reconstructions of dynamic scan $1$ using \gls{MC} including the \gls{SS} derived from; first row: \gls{RPM}, second row: Static \gls{PCA} method, third row: moving window method, forth row: one \gls{PC} method \& firth row: joint method. Colour map ranges are consistent for all images.}
+        \caption{Reconstructions of acquisition $1$ using \gls{MC} including the \gls{SS} derived from; first row: \gls{RPM}, second row: Static \gls{PCA} method, third row: moving window method, forth row: one \gls{PC} method \& firth row: joint method. Colour map ranges are consistent for all images.}
         \label{fig:visual_analysis}
     \end{figure}
     
@@ -76,14 +76,14 @@
         \centering
         \includegraphics[width=0.5\linewidth]{figures/profile_pca.png}
         \captionsetup{singlelinecheck=false, justification=centering}
-        \caption{A profile across the aeorta for reconstructions of dynamic scan $1$ using \gls{MC} including the \gls{SS} derived from; \gls{RPM}, Static \gls{PCA} method, moving window method, one \gls{PC} method \& joint method.}
+        \caption{A profile across the aeorta for reconstructions of acquisition $1$ using \gls{MC} including the \gls{SS} derived from; \gls{RPM}, Static \gls{PCA} method, moving window method, one \gls{PC} method \& joint method.}
         \label{fig:profile}
     \end{figure}
     
     \begin{table}
         \centering
         \captionsetup{singlelinecheck=false, justification=centering}
-        \caption{Comparison of \gls{SUV}\textsubscript{max}, \gls{SUV}\textsubscript{median} \& \gls{SUV}\textsubscript{peak} between reconstructions of dynamic scan $1$ using \gls{MC} including the \gls{SS} derived from; \gls{RPM}, Static \gls{PCA} method, moving window method, one \gls{PC} method \& joint method.}
+        \caption{Comparison of \gls{SUV}\textsubscript{max}, \gls{SUV}\textsubscript{median} \& \gls{SUV}\textsubscript{peak} between reconstructions of acquisition $1$ using \gls{MC} including the \gls{SS} derived from; \gls{RPM}, Static \gls{PCA} method, moving window method, one \gls{PC} method \& joint method.}
         
         \resizebox*{0.5\linewidth}{!}
         {
@@ -103,7 +103,7 @@
         \label{tab:suv}
     \end{table}
     
-     
-
+    A plot of the \gls{SS} for all methods can be seen in~\Fref{fig:surrogate_signal}, the one \gls{PC} method matches the \gls{RPM} best in this example. The reconstructed data, using \glss{SS} from all methods can be seen in~\Fref{fig:visual_analysis}. The clarity of the reconstruction around the aorta seems diminished in the static \gls{PCA} example, it is similar in all other examples. A profile across the aorta can be seen in~\Fref{fig:profile}, this shows that the static \gls{PCA} method differs in its distribution compared to the others. \gls{SUV} results can be seen in~\Fref{tab:suv} \& show that \glss{SUV} are consistent with \gls{RPM} for both the one \gls{PC} method and the joint method.
+    
 \section{Discussion \& Conclusions} \label{sec:discussion_and_conclusions}
     
