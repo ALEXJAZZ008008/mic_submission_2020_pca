@@ -3,18 +3,8 @@
 \usepackage[activate={true, nocompatibility}, final, tracking=true, kerning=true, spacing=true, factor=1100, stretch=10, shrink=10]{microtype}
 \linespread{0.9}
 
-%\def\mycopyrightnotice{
-%  {\footnotesize
-%  \begin{minipage}{\textwidth}
-%  \centering
-%  {978-1-7281-4164-0/19/\$31.00 \copyright2019 IEEE
-%  \end{minipage}
-%  }
-%}
-
 \makeatletter
 \def\ps@IEEEtitlepagestyle{
-  %\def\@oddfoot{\mycopyrightnotice}
   \def\@evenfoot{}
 }
 
@@ -42,19 +32,11 @@
 
 \input{glossary}
 
-\newcommand{\cmmnt}[1]{\@bsphack\@esphack}
-
 \usepackage[style=ieee, doi=false, isbn=false, url=false, maxbibnames=1, minbibnames=1, maxcitenames=1, mincitenames=1, backend=biber, defernumbers=false]{biblatex}
 \addbibresource{./bibtex/bib/Biblio.bib}
 
-%\IEEEpubid{\begin{minipage}{\textwidth}\ \\[9pt] \centering
-%\medskip
-%\\
-%978-1-7281-2260-1/19/\$31.00~\copyright~2019~IEEE
-%\end{minipage}}
-
 \begin{document}
-\title{Extension of Static PCA Based Data Driven Surrogate Signal Extraction Methods to Dynamic PET Using Moving Windows \& Eigenvector Backpropergation}
+\title{Data Driven Surrogate Signal Extraction Methods for Dynamic PET}
 
 \pagestyle{plain}
 \pagenumbering{gobble}

@@ -1,12 +1,14 @@
 \section{Introduction} \label{sec:introduction}
-    \IEEEPARstart{R}{espiratory} motion reduces image resolution in \gls{PET} by introducing blurring \& mis-alignment artefacts~\cite{Nehmeh2008a}. 
+    \IEEEPARstart{R}{espiratory} motion reduces image resolution in \gls{PET} by introducing blurring \& mis-alignment artefacts~\cite{Nehmeh2008a}. This is often combated through the use of gated reconstruction and motion correction. A weakness of gated reconstruction is that it requires a \gls{SS} which reflects the respiratory position of the patient over the acquisition. Methods to determine \glss{SS} include those which use an external device, like the \gls{RPM}, a disadvantage of these methods are that they require the use of additional equipment and a change to clinical practise. Thus, \gls{DD} methods to extract \glss{SS} have become an alternative, these include \gls{PCA}~\cite{Thielemans2011}.
+    
+    A disadvantage of \gls{DD} \gls{SS} extraction methods are that they often do not work for dynamic \gls{PET} data where the tracer kinetics offer more variance than the \gls{RM} does. Previously a moving window method using \gls{FDA} was proposed~\cite{Schleyer2014}. This work seeks to implement a moving window method using \gls{PCA} and then compare this to static \gls{PCA} and other \gls{PCA} based dynamic \gls{DD} \gls{SS} extraction methods.
 
 \section{Methods} \label{sec:methods}
 \subsection{Data Acquisition} \label{sec:data_acquisition}
         Seven dynamic \gls{FDG} acquisitions, with a \gls{FOV} covering the upper lung \& heart, were acquired on a \gls{GE} Discovery $710$. Each acquisition lasted approximately \SI{20}{\minute} with the acquisition starting before injection of the radiotracer. \gls{SS} were acquired in parallel using a \gls{RPM}.
         
     \subsection{Data Preparation} \label{sec:data_preparation}
-        Data were unlisted into low resolution sinograms, at a time interval of \SI{500}{\milli\second}, using the \gls{GE} PetToolbox following~\cite{Bertolli2018Data-DrivenTomography}. Data was preprocessed by removing the first \& last element in the axial direction and applying a Freeman-Tukey to stabilise the variance of the Poisson data. The Freeman-Tukey transformation is defined as:
+        Data were unlisted into low resolution sinograms, at a time interval of \SI{500}{\milli\second}, using the \gls{GE} PetToolbox following~\cite{Bertolli2018Data-DrivenTomography}. Data was preprocessed by removing the first \& last element in the axial direction \& applying a Freeman-Tukey to stabilise the variance of the Poisson data. The Freeman-Tukey transformation is defined as:
         
         \begin{equation}
             S = 2 \sqrt{S + \frac{3}{8}}
@@ -16,18 +18,18 @@
     
     \subsection{Surrogate Signal Extraction} \label{sec:surrogate_signal_extraction}
         \subsubsection{Moving Window} \label{sec:moving_window}
-            This method takes data window by window (with half a window overlap) \& extracts a \gls{SS} using \gls{PCA}. The final \gls{SS} is constructed by determining the sign of the current \gls{SS}, flipping it if necessary, and then concatenating it with the next. The size of the window increases as the acquisition goes on. Motivation is that at early time points the variation caused by the tracer kinetics obscures that which comes from respiratory motion, if the window is smaller than the period of the tracer kinetics then it should obtain the respiratory \gls{SS}.
+            This method takes data window by window (with half a window overlap) \& extracts a \gls{SS} using \gls{PCA}. The final \gls{SS} is constructed by determining the sign of the current \gls{SS}, flipping it if necessary, \& then concatenating it with the next. The size of the window increases as the acquisition goes on. Motivation is that at early time points the variation caused by the tracer kinetics obscures that which comes from respiratory motion, if the window is smaller than the period of the tracer kinetics then it should obtain the respiratory \gls{SS}.
         
         \subsubsection{One \gls{PC}} \label{sec:one_pc}
             This method takes late time point \glss{PC} \& applies them to early time point data. Motivation is that the \glss{PC} of late time point data do not vary significantly, therefore it could be assumed that the variation of early time point \glss{PC} are caused mostly by the tracer kinetics.
         
         \subsubsection{Joint Method} \label{sec:joint_method}
-            This method attempts to take the advantages of both the one \gls{PC} method and the static method, by truncating \& concatenating the result of the start of one with the end of the other. Motivation is that the static method would work better on static data, once the tracer kinetics have subsided the acquisition could be considered to be static.
+            This method attempts to take the advantages of both the one \gls{PC} method \& the static method, by truncating \& concatenating the result of the start of one with the end of the other. Motivation is that the static method would work better on static data, once the tracer kinetics have subsided the acquisition could be considered to be static.
     
     
     \subsection{Evaluation} \label{sec:evaluation}
         \subsubsection{Cross Correlation} \label{sec:cross_correlation}
-            The \gls{CC} of each \gls{SS} between each method and the \gls{RPM}, for all acquisitions, has been calculated. Additionally, the early time point \glss{SS} for each method have been plotted against the \gls{RPM}, for the first acquisition.
+            The \gls{CC} of each \gls{SS} between each method \& the \gls{RPM}, for all acquisitions, has been calculated. Additionally, the early time point \glss{SS} for each method have been plotted against the \gls{RPM}, for the first acquisition.
         
         \subsubsection{Reconstruction} \label{sec:reconstruction}
             Data has been reconstructed, for the first acquisition, using each \gls{SS} to displacement gate the data into $10$ bins. Reconstructions were performed using \gls{GE} Duetto using \gls{TOF} \gls{OSEM} with two full iterations \& $24$ subsets.%~\cite{Hudson1994}.
@@ -109,7 +111,9 @@
         \label{tab:suv}
     \end{table}
     
-    A plot of the \gls{SS} for all methods can be seen in~\Fref{fig:surrogate_signal}, the one \gls{PC} method matches the \gls{RPM} best in this example. The reconstructed data, using \glss{SS} from all methods can be seen in~\Fref{fig:visual_analysis}. The clarity of the reconstruction around the aorta seems diminished in the static \gls{PCA} example, it is similar in all other examples. A profile across the aorta can be seen in~\Fref{fig:profile}, this shows that the static \gls{PCA} method differs in its distribution compared to the others. \gls{SUV} results can be seen in~\Fref{tab:suv} \& show that \glss{SUV} are consistent with \gls{RPM} for both the one \gls{PC} method and the joint method.
+    A plot of the \gls{SS} for all methods can be seen in~\Fref{fig:surrogate_signal}, the one \gls{PC} method matches the \gls{RPM} best in this example. The reconstructed data, using \glss{SS} from all methods can be seen in~\Fref{fig:visual_analysis}, the clarity of the reconstruction around the aorta seems diminished in the static \gls{PCA} example, it is similar in all other examples. A profile across the aorta can be seen in~\Fref{fig:profile}, this shows that the static \gls{PCA} method differs in its distribution. \gls{SUV} results can be seen in~\Fref{tab:suv} \& show that \glss{SUV} are consistent with \gls{RPM} for both the one \gls{PC} method \& the joint method.
     
 \section{Discussion \& Conclusions} \label{sec:discussion_and_conclusions}
+    Results from a comparison of \gls{CC}, a comparison of profiles \& \glss{SUV} show that the one \gls{PC} and joint method show promise in \gls{DD} extraction of \gls{SS} from dynamic data when compared to the static method.
     
+    In the future, research will focus on further development of the one \gls{PC} method, including tuning its hyper parameters as well as testing it on a wider array of data.
