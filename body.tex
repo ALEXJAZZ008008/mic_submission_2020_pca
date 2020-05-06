@@ -1,52 +1,49 @@
 \section{Introduction} \label{sec:introduction}
-    \IEEEPARstart{R}{espiratory} motion reduces image resolution in \gls{PET} by introducing blurring \& mis-alignment artefacts~\cite{Nehmeh2008a}. This is often combated through the use of gated reconstruction \& \gls{MC}. A feature of gated reconstruction is that it requires a \gls{SS} which reflects the position in which the patient is in the respiratory cycle over the acquisition. Methods to determine \glss{SS} include those which use an external devices, like the \gls{RPM}, a disadvantage of these methods are that they require the use of additional equipment \& a change to clinical practise. Thus, \gls{DD} methods to extract \glss{SS} have become an alternative, these include \gls{PCA}~\cite{Thielemans2011}. A disadvantage of \gls{DD} \gls{SS} extraction methods are that they often do produce good results for dynamic \gls{PET} data where the tracer kinetics, at the start of the acquisition, offer more variance than the \gls{RM} does. Previously, a moving window method using \gls{FDA} was proposed~\cite{Schleyer2014}. This work seeks to implement a moving window method using \gls{PCA} \& then compare this to static \gls{PCA} \& other \gls{PCA} based dynamic \gls{DD} \gls{SS} extraction methods.
+    \IEEEPARstart{R}{espiratory} motion reduces image resolution in \gls{PET} by introducing blurring and mis-alignment artefacts~\cite{Nehmeh2008a}. This is often combated through the use of gated reconstruction and motion correction, potentially as a first step towards obtaining motion corrected images. Gating requires a \gls{SS} which reflects the position in which the internal organs are in the respiratory cycle. Methods to determine \glss{SS} include those which use an external devices, like the \gls{RPM}. However, a disadvantage of these methods are that they require the use of additional equipment and a change to clinical practise. Thus, \gls{DD} methods to extract \glss{SS} have become an alternative, these include \gls{PCA}~\cite{Thielemans2011}. To the best of our knowledge, current \gls{DD} \gls{SS} extraction methods fail for dynamic \gls{PET} data where the tracer kinetics, at the start of the acquisition, offer more variance than the respiratory motion does. Previously, a moving window based approach using the spectral analysis method was proposed~\cite{Schleyer2014}. This work seeks to implement a moving window method using \gls{PCA} and then compare this to static \gls{PCA} and other \gls{PCA} based dynamic \gls{DD} \gls{SS} extraction methods.
     
 \vspace{-0.0cm}
 
 \section{Methods} \label{sec:methods}
     \subsection{Data Acquisition} \label{sec:data_acquisition}
-        Seven dynamic \gls{FDG} acquisitions, with a \gls{FOV} covering the upper lung \& heart, were acquired on a \gls{GE} Discovery $710$. Each acquisition lasted approximately \SI{20}{\minute} with the acquisition starting before injection of the radiotracer. \gls{SS} were acquired in parallel using a \gls{RPM}.
+        Five dynamic \gls{FDG} acquisitions, with a \gls{FOV} covering the upper lung and heart, were acquired on a \gls{GE} Discovery $710$. Each acquisition lasted approximately \SI{20}{\minute} with the acquisition starting before injection of the radiotracer. \glss{SS} were acquired in parallel using a \gls{RPM}.
         
     \vspace{-0.5cm}
         
     \subsection{Data Preparation} \label{sec:data_preparation}
-        Data were unlisted into low resolution sinograms, at a time interval of \SI{500}{\milli\second}, using the \gls{GE} PetToolbox following~\cite{Bertolli2018Data-DrivenTomography}. Data was preprocessed by removing the first \& last element in the axial direction \& applying a Freeman-Tukey transformation to stabilise the variance of the Poisson data. The Freeman-Tukey transformation is defined as:
-        
-        \vspace{-0.25cm}
-        
-        \begin{equation}
-            S_g := 2 \sqrt{S_p + \frac{3}{8}}
-        \end{equation}
-        
-        \vspace{-0.0cm}
-        
-        \noindent $S_g$ is the resultant, Gaussian distributed, sinogram of applying the Freeman-Tukey transformation to Poisson distributed sinogram $S_p$~\cite{Freeman1950TransformationsRoot}.
+        Data were unlisted into low resolution sinograms, at a time interval of \SI{500}{\milli\second}, using the \gls{GE} PetToolbox following~\cite{Bertolli2018Data-DrivenTomography}. Data was preprocessed by removing the first and last sinogram in the axial direction and applying a Freeman-Tukey transformation to stabilise the variance of the Poisson data \cite{Freeman1950TransformationsRoot}. %The Freeman-Tukey transformation is defined as:
+        %
+        %\vspace{-0.25cm}
+        %
+        %\begin{equation}
+        %    S_g := 2 \sqrt{S_p + \frac{3}{8}}
+        %\end{equation}
+        %
+        %\vspace{-0.0cm}
+        %
+        %\noindent $S_g$ is the resultant, Gaussian distributed, sinogram of applying the Freeman-Tukey transformation to Poisson distributed sinogram $S_p$~\cite{Freeman1950TransformationsRoot}.
         
     \vspace{-0.5cm}
     
     \subsection{Surrogate Signal Extraction} \label{sec:surrogate_signal_extraction}
-        The current practise of applying static \gls{PCA} to the entire acquisition was compared with:
+        In a first attempt static \gls{PCA} was applied to the entire acquisition. This was compared with:
         
         \subsubsection{Moving Window} \label{sec:moving_window}
-            This method takes data window by window (with half a window overlap) \& extracts a \gls{SS} using \gls{PCA}. The final \gls{SS} is constructed by determining the sign of the current \gls{SS} (using \gls{CC}), flipping it if necessary, \& then concatenating it with the next. The size of the window increases as the acquisition goes on. The motivation is that at early time points the variation caused by the tracer kinetics obscures that which comes from respiratory motion, if the window is smaller than the period of the tracer kinetics then it should obtain the respiratory \gls{SS}.
+            This method takes data window by window (with half a window overlap) and extracts a \gls{SS} using \gls{PCA}. The final \gls{SS} is constructed by determining the sign of the current \gls{SS} (using \gls{CC} in the overlap with the previous window), flipping it if necessary, and then, taking the mean where it overlaps, and concatenating it with the previous \gls{SS}. The size of the window increases as the acquisition goes on. The motivation is that at early time points the variation caused by the tracer kinetics obscures that which comes from respiratory motion, and reducing the window size decreases the change in the data due to the tracer kinetics.
         
         \subsubsection{One \gls{PC}} \label{sec:one_pc}
-            This method takes late time point \glss{PC} \& applies them to early time point data. The motivation is that the \glss{PC} of late time point data do not vary significantly, therefore it could be assumed that the variation of early time point \glss{PC} are caused mostly by the tracer kinetics.
-        
-        \subsubsection{Joint Method} \label{sec:joint_method}
-            This method attempts to take the advantages of both the one \gls{PC} method \& the static method, by truncating \& concatenating the result of the start of one with the end of the other. The motivation is that the static method would work better on static data, once the tracer kinetics have subsided the acquisition could be considered to be static.
+            This method takes a late time point \gls{PC} and applies it to early time point data using the normal formula to find the weight at a particular time point. The motivation is that the \glss{PC} of late time point data capture mostly the respiratory motion only. This was verified by checking that the late time point \glss{PC} did not vary substantially.
             
     \vspace{-0.5cm}
     
     \subsection{Evaluation} \label{sec:evaluation}
         \subsubsection{Cross Correlation} \label{sec:cross_correlation}
-            The \gls{CC} of each \gls{SS} between each method \& the \gls{RPM}, for all acquisitions, has been calculated. Additionally, the early time point \glss{SS} for each method have been plotted against the \gls{RPM}, for the first acquisition.
+            The \gls{CC} of each \gls{SS} between each method and the \gls{RPM}, for all acquisitions, has been calculated. Additionally, the early time point \glss{SS} for each method have been plotted against the \gls{RPM}, for the first acquisition.
         
         \subsubsection{Reconstruction} \label{sec:reconstruction}
-            Data has been reconstructed, for the first acquisition, using each \gls{SS} to displacement gate the data into $10$ bins. Reconstructions were performed using \gls{GE} Duetto with \gls{TOF} \gls{OSEM} using two full iterations \& $24$ subsets.%~\cite{Hudson1994}.
-            Volumes were post-filtered using a Gaussian blur with a kernel size of \SI{6.4}{\milli\metre} \gls{FWHM}.
+            Data has been reconstructed, for the first acquisition, using each \gls{SS} to displacement gate the data into $10$ bins. Reconstructions were performed using \gls{GE} Duetto with \gls{TOF} \gls{OSEM} using two full iterations and $24$ subsets.%~\cite{Hudson1994}.
+            Attenuation, scatter and randoms were not taken into account. Volumes were post-filtered using a Gaussian blur with a kernel size of \SI{6.4}{\milli\metre} \gls{FWHM}.
             
-            Comparisons between these \gls{MC} reconstructed volumes includes: A profile over the aorta \& \gls{SUV}\textsubscript{max}, \gls{SUV}\textsubscript{median} \& \gls{SUV}\textsubscript{peak}. \gls{SUV}\textsubscript{peak} here was defined following \gls{EANM} guidelines.%~\cite{Boellaard2015FDG2.0}
+            Comparisons between these motion corrected reconstructed volumes includes: A profile over the aorta and \gls{SUV}\textsubscript{max}, \gls{SUV}\textsubscript{median} and \gls{SUV}\textsubscript{peak}. \gls{SUV}\textsubscript{peak} here was defined following \gls{EANM} guidelines.%~\cite{Boellaard2015FDG2.0}
             
 \vspace{-0.5cm}
         
@@ -55,36 +52,34 @@
         \vspace{-0.5cm}
         \centering
         \captionsetup{singlelinecheck=false, justification=centering}
-        \caption{A comparison of the \gls{CC} between the \gls{RPM} \gls{SS} \& the \gls{SS} from the static \gls{PCA}, the moving window, the one \gls{PC} \& the joint methods for $7$ acquisitions.}
+        \caption{A comparison of the \gls{CC} between the \gls{RPM} \gls{SS} and the \gls{SS} from the static \gls{PCA}, the moving window and the one \gls{PC} method for five acquisitions.}
         
-        \resizebox*{0.75\linewidth}{!}
+        \resizebox*{1.0\linewidth}{!}
         {
-            \begin{tabular}{||c|cccc||}
+            \begin{tabular}{||c|ccc||}
                 \hline
-                \textbf{\gls{CC}} & \textbf{Static \gls{PCA}} & \textbf{Moving Window} & \textbf{One \gls{PC}} & \textbf{Joint Method} \\
+                \textbf{\gls{CC}} & \textbf{Static \gls{PCA}} & \textbf{Moving Window} & \textbf{One \gls{PC}} \\
                 \hline
-                \textbf{Acquisition $1$}   & $0.0387$  & $0.486$  & $0.565$  & $0.493$   \\
-                \textbf{Acquisition $2$}   & $0.0985$  & $0.0361$ & $0.281$  & $0.0227$  \\
-                \textbf{Acquisition $3$}   & $0.00797$ & $0.0388$ & $0.224$  & $0.00459$ \\
-                \textbf{Acquisition $4$}   & $0.242$   & $0.0467$ & $0.273$  & $0.0946$  \\
-                \textbf{Acquisition $5$}   & $0.0759$  & $0.793$  & $0.819$  & $0.798$   \\
-                \textbf{Acquisition $6$}   & $0.0594$  & $0.246$  & $0.363$  & $0.259$   \\
-                \textbf{Acquisition $7$}   & $0.160$   & $0.629$  & $0.203$  & $0.526$   \\
+                \textbf{Acquisition one}    & $0.0412$  & $0.670$ & $0.851$ \\
+                \textbf{Acquisition two}    & $0.0269$  & $0.582$ & $0.901$ \\
+                \textbf{Acquisition three}  & $0.00579$ & $0.804$ & $0.869$ \\
+                \textbf{Acquisition four}   & $0.0321$  & $0.714$ & $0.859$ \\
+                \textbf{Acquisition five}   & $0.0220$  & $0.596$ & $0.779$ \\
                 \hline
             \end{tabular}
         }
         \label{tab:cross_correlation}
-        \vspace{-0.5cm}
+        \vspace{-0.0cm}
     \end{table}
     
-    A comparison of \gls{CC} can be seen in in~\Fref{tab:cross_correlation}. The results for the moving window method show that it usually performs better than static \gls{PCA}, a reason why these results may be varied is because the hyper parameters for this method were optimised for one acquisition. The results for the one \gls{PC} method are consistently better than the static \gls{PCA} method.
+    A comparison of \gls{CC} can be seen in~\Fref{tab:cross_correlation}. The results for both the moving window and the one \gls{PC} method show that they perform better than static \gls{PCA}. The results for the moving window method are more varied than the one \gls{PC} method as it has far more hyper parameters and is substantially more sensitive to them.
     
     \begin{figure}
         \vspace{-0.0cm}
         \centering
         \includegraphics[width=1.0\linewidth]{figures/surrogate_signal.png}
         \captionsetup{singlelinecheck=false, justification=centering}
-        \caption{A comparison between the \gls{RPM} \gls{SS} \& the \gls{SS} from the static \gls{PCA}, the moving window, the one \gls{PC} \& the joint methods.}
+        \caption{A visual comparison between the \gls{RPM} \gls{SS} and the \gls{SS} from the static \gls{PCA}, the moving window and the one \gls{PC} for acquisition one between \SI{40}{\second} and \SI{110}{\second}.}
         \label{fig:surrogate_signal}
         \vspace{-0.5cm}
     \end{figure}
@@ -92,9 +87,9 @@
     \begin{figure}
         \vspace{-0.5cm}
         \centering
-        \includegraphics[width=0.75\linewidth]{figures/visual_analysis_pca.png}
+        \includegraphics[width=0.8\linewidth]{figures/visual_analysis_pca.png}
         \captionsetup{singlelinecheck=false, justification=centering}
-        \caption{Gated reconstructions using; \gls{RPM}, static \gls{PCA} method, moving window method, one \gls{PC} method \& joint method. Colour map ranges are consistent for all images.}
+        \caption{Gated reconstructions of acquisition one using the \gls{RPM}, static \gls{PCA}, moving window and one \gls{PC} method \gls{SS}. Colour map ranges are consistent for all images.}
         \label{fig:visual_analysis}
         \vspace{-0.5cm}
     \end{figure}
@@ -102,20 +97,20 @@
     \begin{figure}
         \vspace{-0.0cm}
         \centering
-        \includegraphics[width=0.75\linewidth]{figures/profile_pca.png}
+        \includegraphics[width=1.0\linewidth]{figures/profile_pca.png}
         \captionsetup{singlelinecheck=false, justification=centering}
-        \caption{A profile across the aorta for gated reconstructions using; \gls{RPM}, static \gls{PCA} method, moving window method, one \gls{PC} method \& joint method.}
+        \caption{A profile across the aorta, in the superior-inferior direction, for gated reconstructions of acquisition one using the \gls{RPM}, static \gls{PCA}, moving window and one \gls{PC} method \gls{SS}.}
         \label{fig:profile}
         \vspace{-0.5cm}
     \end{figure}
     
     \begin{table}
-        \vspace{-0.0cm}
+        \vspace{-0.5cm}
         \centering
         \captionsetup{singlelinecheck=false, justification=centering}
-        \caption{Comparison of \gls{SUV}\textsubscript{max}, \gls{SUV}\textsubscript{median} \& \gls{SUV}\textsubscript{peak} between gated reconstructions using; \gls{RPM}, static \gls{PCA} method, moving window method, one \gls{PC} method \& joint method.}
+        \caption{Comparison of \gls{SUV}\textsubscript{max}, \gls{SUV}\textsubscript{median} and \gls{SUV}\textsubscript{peak} between gated reconstructions of acquisition one using the \gls{RPM}, static \gls{PCA}, moving window and one \gls{PC} method \gls{SS}.}
         
-        \resizebox*{0.5\linewidth}{!}
+        \resizebox*{0.75\linewidth}{!}
         {
             \begin{tabular}{||c|ccc||}
                 \hline
@@ -126,7 +121,6 @@
                 \textbf{Static \gls{PCA}}   & $12.8$ & $10.6$ & $11.4$ \\
                 \textbf{Moving Window}      & $14.5$ & $10.6$ & $11.3$ \\
                 \textbf{One \gls{PC}}       & $18.5$ & $10.9$ & $12.6$ \\
-                \textbf{Joint Method}       & $18.5$ & $11.0$ & $12.8$ \\
                 \hline
             \end{tabular}
         }
@@ -134,11 +128,11 @@
         \vspace{-0.5cm}
     \end{table}
     
-    A plot of the \gls{SS} for all methods can be seen in~\Fref{fig:surrogate_signal}, the one \gls{PC} method matches the \gls{RPM} best in this example. The reconstructed data, using \glss{SS} from all methods can be seen in~\Fref{fig:visual_analysis}, the clarity of the reconstruction around the aorta seems diminished in the static \gls{PCA} example, it is similar in all other examples. A profile across the aorta can be seen in~\Fref{fig:profile}, this shows that the static \gls{PCA} method differs in its distribution. \gls{SUV} results can be seen in~\Fref{tab:suv} \& show that \glss{SUV} are consistent with \gls{RPM} for both the one \gls{PC} method \& the joint method.
+    A plot of the \gls{SS} for all methods can be seen in~\Fref{fig:surrogate_signal}, the one \gls{PC} method matches the \gls{RPM} best in this example. The reconstructed data, using \glss{SS} from all methods can be seen in~\Fref{fig:visual_analysis}, the clarity of the reconstruction around the aorta seems diminished in the static \gls{PCA} example, it is similar in all other examples. A profile across the aorta can be seen in~\Fref{fig:profile}, this shows that the static \gls{PCA} method differs in its distribution. \gls{SUV} results can be seen in~\Fref{tab:suv} and show that \glss{SUV} are consistent with \gls{RPM} for both the one \gls{PC} method.
     
-\vspace{-0.5cm}
+\vspace{-0.25cm}
     
-\section{Discussion \& Conclusions} \label{sec:discussion_and_conclusions}
-    Results from a comparison of \gls{CC}, a comparison of profiles \& \glss{SUV} show that the moving window, one \gls{PC} \& joint method show promise in \gls{DD} extraction of \gls{SS} from dynamic data when compared to the static method.
+\section{Discussion and Conclusions} \label{sec:discussion_and_conclusions}
+    Results from a comparison of \gls{CC}, profiles and \glss{SUV} show that the moving window and one \gls{PC} show promise in \gls{DD} extraction of \gls{SS} from dynamic data when compared to the static method.
     
     In the future, research will focus on further development of the one \gls{PC} method, including tuning its hyper parameters as well as testing it on a wider array of data.
